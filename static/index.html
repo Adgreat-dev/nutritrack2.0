@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriTracker | AI Product Analyzer</title>
+    <meta name="description" content="AI analyzer for food and cosmetic product ingredients and claims">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                    <path d="M2 22 12 12"/>
+                </svg>
+                <h1>Nutri<span>Tracker</span></h1>
+            </div>
+            <p class="subtitle">Uncover the truth behind labels.</p>
+            <p class="info-text">Upload an image of <strong>any product's packaging or ingredients</strong> (food, cosmetics, supplements, household items) and our AI will automatically classify it, break down the ingredients, and fact-check its claims.</p>
+        </header>
+
+        <section id="features-section" class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                </div>
+                <h3>Universal Analyzer</h3>
+                <p>One tool for everything. Food, cosmetics, supplements, or cleaning products—our AI detects the category automatically so you don't have to choose.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>
+                </div>
+                <h3>Ingredient Breakdown</h3>
+                <p>We extract every ingredient from the label and classify it as good, bad, or neutral based on its scientific properties.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <h3>Fact-Check Claims</h3>
+                <p>"100% Natural"? "Non-Toxic"? We cross-reference marketing claims with the actual chemical composition to expose the truth.</p>
+            </div>
+        </section>
+
+        <section class="upload-section card">
+            <div class="drop-zone" id="drop-zone">
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+                <div class="upload-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </div>
+                <h3>Drag & Drop an image of the product</h3>
+                <p>or click to browse</p>
+            </div>
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Analyzing with AI...</p>
+            </div>
+        </section>
+
+        <section id="result-section" class="result-section hidden card">
+            <div class="result-header">
+                <h2 id="product-name">Product Name</h2>
+            </div>
+            
+            <div class="score-card">
+                <div class="circular-progress">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="progress" id="score-circle" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="score-value">
+                        <span id="score-text">0</span>
+                        <div class="score-label">Health Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-grid">
+                <div class="ingredients-card">
+                    <h3>Ingredients Breakdown</h3>
+                    <ul id="ingredients-list" class="item-list"></ul>
+                </div>
+
+                <div class="claims-card">
+                    <h3>Claims Verification</h3>
+                    <ul id="claims-list" class="item-list"></ul>
+                </div>
+            </div>
+            <button id="reset-btn" class="primary-btn">Analyze Another</button>
+        </section>
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
