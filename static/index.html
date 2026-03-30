@@ -1,103 +1,594 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriTracker | AI Product Analyzer</title>
-    <meta name="description" content="AI analyzer for food and cosmetic product ingredients and claims">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>VerifAI — Know Your Ingredients</title>
+    <meta name="description"
+        content="AI-powered ingredient analysis. Know exactly what's in your food, cosmetics, and supplements.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
-    <main class="container">
-        <header>
-            <div class="logo">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-                    <path d="M2 22 12 12"/>
+
+    <!-- ═══════════════ NAV ═══════════════ -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo" onclick="showPage('landing')">
+            <div class="logo-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2" />
+                    <path d="M10 8h4" />
+                    <path d="M6 18h12" />
+                    <circle cx="12" cy="14" r="2" />
+                    <path d="M12 2v4" />
                 </svg>
-                <h1>Nutri<span>Tracker</span></h1>
             </div>
-            <p class="subtitle">Uncover the truth behind labels.</p>
-            <p class="info-text">Upload an image of <strong>any product's packaging or ingredients</strong> (food, cosmetics, supplements, household items) and our AI will automatically classify it, break down the ingredients, and fact-check its claims.</p>
-        </header>
+            <span class="logo-text">Verif<em>AI</em></span>
+        </a>
+        <div class="nav-links" id="nav-links">
+            <a href="#how-it-works" class="nav-link">How it works</a>
+            <a href="#features" class="nav-link">Features</a>
+            <button class="nav-btn-ghost" onclick="showPage('login')">Sign in</button>
+            <button class="nav-btn-primary" onclick="showPage('signup')">Get started</button>
+        </div>
+        <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
 
-        <section id="features-section" class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+    <!-- ═══════════════ LANDING PAGE ═══════════════ -->
+    <div id="page-landing">
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-noise"></div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    AI-powered · Science-backed · Instant results
                 </div>
-                <h3>Universal Analyzer</h3>
-                <p>One tool for everything. Food, cosmetics, supplements, or cleaning products—our AI detects the category automatically so you don't have to choose.</p>
+                <h1 class="hero-title">
+                    Know exactly<br>
+                    <em>what's inside.</em>
+                </h1>
+                <p class="hero-sub">Upload any product label — food, cosmetics, supplements — and VerifAI breaks down
+                    every ingredient, scores the product, and fact-checks every claim on the package.</p>
+                <div class="hero-cta">
+                    <button class="btn-primary-lg" onclick="showPage('signup')">
+                        Start analyzing free
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <button class="btn-ghost-lg" onclick="showPage('analyzer')">
+                        Try without signing in
+                    </button>
+                </div>
+                <div class="hero-trust">
+                    <span>Powered by Gemini 2.5 Pro</span>
+                    <span class="trust-dot">·</span>
+                    <span>Food, Cosmetics, Supplements</span>
+                    <span class="trust-dot">·</span>
+                    <span>Instant Analysis</span>
+                </div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>
+            <div class="hero-visual">
+                <div class="mockup-card">
+                    <div class="mockup-header">
+                        <div class="mockup-dots"><span></span><span></span><span></span></div>
+                        <span class="mockup-title">Analysis Result</span>
+                    </div>
+                    <div class="mockup-product">Vitamin C Serum 20%</div>
+                    <div class="mockup-score-row">
+                        <div class="mockup-score-ring">
+                            <svg viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="24" fill="none" stroke="#e8edf2" stroke-width="5" />
+                                <circle cx="30" cy="30" r="24" fill="none" stroke="#2dd4bf" stroke-width="5"
+                                    stroke-dasharray="150.7" stroke-dashoffset="30" stroke-linecap="round"
+                                    transform="rotate(-90 30 30)" />
+                            </svg>
+                            <div class="mockup-score-val">80</div>
+                        </div>
+                        <div class="mockup-score-label">
+                            <div class="mockup-label-title">Safety Score</div>
+                            <div class="mockup-label-sub">Good — Mostly safe</div>
+                        </div>
+                    </div>
+                    <div class="mockup-ingredients">
+                        <div class="mockup-ing good"><span class="mockup-dot good"></span>L-Ascorbic Acid <span
+                                class="mockup-tag good-tag">Good</span></div>
+                        <div class="mockup-ing neutral"><span class="mockup-dot neutral"></span>Propylene Glycol <span
+                                class="mockup-tag neutral-tag">Neutral</span></div>
+                        <div class="mockup-ing bad"><span class="mockup-dot bad"></span>Fragrance / Parfum <span
+                                class="mockup-tag bad-tag">Caution</span></div>
+                        <div class="mockup-ing good"><span class="mockup-dot good"></span>Ferulic Acid <span
+                                class="mockup-tag good-tag">Good</span></div>
+                    </div>
+                    <div class="mockup-claim">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="m15 9-6 6M9 9l6 6" />
+                        </svg>
+                        <span>"Fragrance-Free" — <strong>Misleading</strong></span>
+                    </div>
                 </div>
-                <h3>Ingredient Breakdown</h3>
-                <p>We extract every ingredient from the label and classify it as good, bad, or neutral based on its scientific properties.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                <div class="hero-float-badge top-right">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                    </svg>
+                    Claims verified
                 </div>
-                <h3>Fact-Check Claims</h3>
-                <p>"100% Natural"? "Non-Toxic"? We cross-reference marketing claims with the actual chemical composition to expose the truth.</p>
+                <div class="hero-float-badge bottom-left">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
+                    </svg>
+                    All ingredients classified
+                </div>
             </div>
         </section>
 
-        <section class="upload-section card">
-            <div class="drop-zone" id="drop-zone">
-                <input type="file" id="file-input" accept="image/*" class="hidden">
-                <div class="upload-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="17 8 12 3 7 8"/>
-                        <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
+        <!-- HOW IT WORKS -->
+        <section class="how-it-works" id="how-it-works">
+            <div class="section-inner">
+                <div class="section-label">Simple process</div>
+                <h2 class="section-title">Three steps to full transparency</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">01</div>
+                        <div class="step-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <rect width="18" height="18" x="3" y="3" rx="2" />
+                                <path d="M3 9h18M9 21V9" />
+                            </svg>
+                        </div>
+                        <h3>Upload a photo</h3>
+                        <p>Snap or upload any image of a product label, ingredient list, or packaging. Any category
+                            works — food, beauty, health.</p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step-card">
+                        <div class="step-num">02</div>
+                        <div class="step-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M6 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2" />
+                                <path d="M10 8h4" />
+                                <circle cx="12" cy="14" r="2" />
+                                <path d="M12 2v4" />
+                            </svg>
+                        </div>
+                        <h3>AI runs the analysis</h3>
+                        <p>Gemini 2.5 Pro reads every ingredient, categorizes its safety profile, and detects all
+                            marketing claims on the label.</p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step-card">
+                        <div class="step-num">03</div>
+                        <div class="step-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                        </div>
+                        <h3>Get your full report</h3>
+                        <p>A scored safety report, ingredient-by-ingredient breakdown, and verified or flagged claims —
+                            all in seconds.</p>
+                    </div>
                 </div>
-                <h3>Drag & Drop an image of the product</h3>
-                <p>or click to browse</p>
-            </div>
-            <div id="loading" class="hidden">
-                <div class="spinner"></div>
-                <p>Analyzing with AI...</p>
             </div>
         </section>
 
-        <section id="result-section" class="result-section hidden card">
-            <div class="result-header">
-                <h2 id="product-name">Product Name</h2>
+        <!-- FEATURES -->
+        <section class="features-section" id="features">
+            <div class="section-inner">
+                <div class="section-label">What you get</div>
+                <h2 class="section-title">Everything you need to<br>make informed choices</h2>
+                <div class="features-bento">
+                    <div class="bento-card bento-wide">
+                        <div class="bento-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path
+                                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                            </svg>
+                        </div>
+                        <h3>Universal product detection</h3>
+                        <p>VerifAI automatically identifies whether your product is food, a cosmetic, supplement, or
+                            household item — no manual selection needed.</p>
+                    </div>
+                    <div class="bento-card">
+                        <div class="bento-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
+                            </svg>
+                        </div>
+                        <h3>Ingredient breakdown</h3>
+                        <p>Every ingredient classified as <strong>good</strong>, <strong>neutral</strong>, or
+                            <strong>caution</strong> with a scientific explanation.
+                        </p>
+                    </div>
+                    <div class="bento-card">
+                        <div class="bento-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                        </div>
+                        <h3>Claims fact-checker</h3>
+                        <p>"100% Natural"? "Dermatologist tested"? We verify each claim against the actual chemical
+                            composition.</p>
+                    </div>
+                    <div class="bento-card bento-tall">
+                        <div class="bento-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 8v4l3 3" />
+                            </svg>
+                        </div>
+                        <h3>Safety score</h3>
+                        <p>A 0–100 health/safety score gives you an at-a-glance verdict, color-coded from green to red.
+                        </p>
+                        <div class="bento-score-demo">
+                            <div class="bento-score-bar" style="--pct: 80%; --clr: #10b981">
+                                <span>80 — Healthy</span>
+                            </div>
+                            <div class="bento-score-bar" style="--pct: 52%; --clr: #f59e0b">
+                                <span>52 — Moderate</span>
+                            </div>
+                            <div class="bento-score-bar" style="--pct: 24%; --clr: #ef4444">
+                                <span>24 — Caution</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="score-card">
-                <div class="circular-progress">
-                    <svg viewBox="0 0 100 100">
-                        <circle class="bg" cx="50" cy="50" r="45"></circle>
-                        <circle class="progress" id="score-circle" cx="50" cy="50" r="45"></circle>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <div class="section-inner cta-inner">
+                <h2>Stop guessing.<br><em>Start knowing.</em></h2>
+                <p>Join thousands of people making smarter product choices with VerifAI.</p>
+                <button class="btn-primary-lg" onclick="showPage('signup')">
+                    Create a free account
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
-                    <div class="score-value">
-                        <span id="score-text">0</span>
-                        <div class="score-label">Health Score</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <a class="nav-logo" href="#">
+                    <div class="logo-icon small">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2" />
+                            <path d="M10 8h4" />
+                            <circle cx="12" cy="14" r="2" />
+                            <path d="M12 2v4" />
+                        </svg>
+                    </div>
+                    <span class="logo-text small">Verif<em>AI</em></span>
+                </a>
+                <p class="footer-note">© 2025 VerifAI. Know Your Ingredients.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+    <div id="page-login" class="auth-page hidden">
+        <div class="auth-split">
+            <div class="auth-panel-left">
+                <div class="auth-brand" onclick="showPage('landing')">
+                    <div class="logo-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2" />
+                            <path d="M10 8h4" />
+                            <circle cx="12" cy="14" r="2" />
+                            <path d="M12 2v4" />
+                        </svg></div>
+                    <span class="logo-text">Verif<em>AI</em></span>
+                </div>
+                <div class="auth-quote">
+                    <blockquote>"Knowing what's in your products is not a luxury — it's a right."</blockquote>
+                </div>
+            </div>
+            <div class="auth-panel-right">
+                <div class="auth-form-wrap">
+                    <h2 class="auth-title">Welcome back</h2>
+                    <p class="auth-sub">Sign in to your account to continue</p>
+
+                    <button class="google-btn" onclick="handleGoogleAuth()">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path fill="#4285F4"
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853"
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05"
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="#EA4335"
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Continue with Google
+                    </button>
+
+                    <div class="auth-divider"><span>or continue with email</span></div>
+
+                    <div class="field-group">
+                        <label for="login-email">Email address</label>
+                        <input type="email" id="login-email" placeholder="you@example.com" class="auth-input">
+                        <span class="auth-error" id="login-email-error"></span>
+                    </div>
+                    <div class="field-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="••••••••" class="auth-input">
+                        <span class="auth-error" id="login-password-error"></span>
+                    </div>
+                    <button class="auth-submit-btn" onclick="handleLogin()">Sign in</button>
+
+                    <p class="auth-switch">Don't have an account? <a href="#" onclick="showPage('signup')">Sign up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SIGNUP PAGE ═══════════════ -->
+    <div id="page-signup" class="auth-page hidden">
+        <div class="auth-split">
+            <div class="auth-panel-left">
+                <div class="auth-brand" onclick="showPage('landing')">
+                    <div class="logo-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2" />
+                            <path d="M10 8h4" />
+                            <circle cx="12" cy="14" r="2" />
+                            <path d="M12 2v4" />
+                        </svg></div>
+                    <span class="logo-text">Verif<em>AI</em></span>
+                </div>
+                <div class="auth-quote">
+                    <blockquote>"Transparency is the foundation of trust."</blockquote>
+                </div>
+            </div>
+            <div class="auth-panel-right">
+                <div class="auth-form-wrap">
+                    <h2 class="auth-title">Create account</h2>
+                    <p class="auth-sub">Start analyzing products for free</p>
+
+                    <button class="google-btn" onclick="handleGoogleAuth()">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path fill="#4285F4"
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853"
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05"
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="#EA4335"
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Sign up with Google
+                    </button>
+
+                    <div class="auth-divider"><span>or use email</span></div>
+
+                    <div class="field-group">
+                        <label for="signup-name">Full name</label>
+                        <input type="text" id="signup-name" placeholder="Jane Smith" class="auth-input">
+                        <span class="auth-error" id="signup-name-error"></span>
+                    </div>
+                    <div class="field-group">
+                        <label for="signup-email">Email address</label>
+                        <input type="email" id="signup-email" placeholder="you@example.com" class="auth-input">
+                        <span class="auth-error" id="signup-email-error"></span>
+                    </div>
+                    <div class="field-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="Min. 8 characters" class="auth-input">
+                        <span class="auth-error" id="signup-password-error"></span>
+                    </div>
+                    <button class="auth-submit-btn" onclick="handleSignup()">Create account</button>
+
+                    <p class="auth-switch">Already have an account? <a href="#" onclick="showPage('login')">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ ANALYZER PAGE ═══════════════ -->
+    <div id="page-analyzer" class="analyzer-page hidden">
+
+        <!-- Analyzer Nav -->
+        <nav class="analyzer-nav">
+            <a class="nav-logo" href="#" onclick="showPage('landing')">
+                <div class="logo-icon small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M6 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2" />
+                        <path d="M10 8h4" />
+                        <circle cx="12" cy="14" r="2" />
+                        <path d="M12 2v4" />
+                    </svg></div>
+                <span class="logo-text small">Verif<em>AI</em></span>
+            </a>
+            <button class="nav-btn-ghost small" onclick="showPage('login')">Sign in</button>
+        </nav>
+
+        <div class="analyzer-container">
+
+            <!-- Upload State -->
+            <div id="analyzer-upload">
+                <div class="analyzer-hero-text">
+                    <h2>Analyze any product</h2>
+                    <p>Upload a photo of the ingredient label or product packaging</p>
+                </div>
+                <div class="drop-zone" id="drop-zone">
+                    <input type="file" id="file-input" accept="image/*" class="hidden">
+                    <div class="drop-zone-inner">
+                        <div class="upload-icon-wrap">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <p class="drop-title">Drop your image here</p>
+                        <p class="drop-sub">or <span class="drop-link">click to browse</span></p>
+                        <p class="drop-hint">PNG, JPG, WEBP · Max 10MB</p>
+                    </div>
+                </div>
+                <div class="analyzer-categories">
+                    <span>Works with:</span>
+                    <div class="cat-tags">
+                        <span class="cat-tag">🥗 Food</span>
+                        <span class="cat-tag">💄 Cosmetics</span>
+                        <span class="cat-tag">💊 Supplements</span>
+                        <span class="cat-tag">🧴 Skincare</span>
+                        <span class="cat-tag">🧹 Household</span>
                     </div>
                 </div>
             </div>
 
-            <div class="analysis-grid">
-                <div class="ingredients-card">
-                    <h3>Ingredients Breakdown</h3>
+            <!-- Loading State -->
+            <div id="analyzer-loading" class="hidden">
+                <div class="loading-wrap">
+                    <div class="loading-orb"></div>
+                    <p class="loading-title">Analyzing your product</p>
+                    <p class="loading-sub" id="loading-step">Reading ingredient label...</p>
+                    <div class="loading-steps">
+                        <div class="lstep active" id="lstep-1">Reading label</div>
+                        <div class="lstep" id="lstep-2">Classifying ingredients</div>
+                        <div class="lstep" id="lstep-3">Verifying claims</div>
+                        <div class="lstep" id="lstep-4">Scoring product</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result State -->
+            <div id="analyzer-result" class="hidden">
+
+                <div class="result-topbar">
+                    <div class="result-product-info">
+                        <div class="result-category-badge" id="result-category">Food</div>
+                        <h2 id="product-name">Product Name</h2>
+                    </div>
+                    <div class="result-topbar-actions">
+                        <button class="download-pdf-btn" id="download-pdf-btn">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Download Report
+                        </button>
+                        <button class="reset-btn" id="reset-btn">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M8 16H3v5" />
+                            </svg>
+                            Analyze another
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Score + Summary Row -->
+                <div class="result-summary-row">
+                    <div class="score-block">
+                        <div class="circular-progress">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="score-bg" cx="50" cy="50" r="42"></circle>
+                                <circle class="score-ring" id="score-circle" cx="50" cy="50" r="42"></circle>
+                            </svg>
+                            <div class="score-center">
+                                <span id="score-text">0</span>
+                                <div class="score-label">/ 100</div>
+                            </div>
+                        </div>
+                        <div class="score-meta">
+                            <div class="score-verdict" id="score-verdict">Good</div>
+                            <div class="score-meta-label">Overall Safety Score</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-stats" id="summary-stats">
+                        <div class="stat-pill good">
+                            <span id="count-good">0</span>
+                            <span>Good</span>
+                        </div>
+                        <div class="stat-pill neutral">
+                            <span id="count-neutral">0</span>
+                            <span>Neutral</span>
+                        </div>
+                        <div class="stat-pill bad">
+                            <span id="count-bad">0</span>
+                            <span>Caution</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="result-tabs">
+                    <button class="tab-btn active" data-tab="ingredients" onclick="switchTab('ingredients', this)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
+                        </svg>
+                        Ingredients
+                    </button>
+                    <button class="tab-btn" data-tab="claims" onclick="switchTab('claims', this)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                        </svg>
+                        Claims
+                    </button>
+                </div>
+
+                <!-- Ingredients Tab -->
+                <div id="tab-ingredients" class="tab-content">
+                    <div class="tab-filter-row">
+                        <button class="filter-btn active" data-filter="all"
+                            onclick="filterIngredients('all', this)">All</button>
+                        <button class="filter-btn" data-filter="good"
+                            onclick="filterIngredients('good', this)">Good</button>
+                        <button class="filter-btn" data-filter="neutral"
+                            onclick="filterIngredients('neutral', this)">Neutral</button>
+                        <button class="filter-btn" data-filter="bad"
+                            onclick="filterIngredients('bad', this)">Caution</button>
+                    </div>
                     <ul id="ingredients-list" class="item-list"></ul>
                 </div>
 
-                <div class="claims-card">
-                    <h3>Claims Verification</h3>
+                <!-- Claims Tab -->
+                <div id="tab-claims" class="tab-content hidden">
                     <ul id="claims-list" class="item-list"></ul>
                 </div>
+
             </div>
-            <button id="reset-btn" class="primary-btn">Analyze Another</button>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <script src="/static/script.js"></script>
 </body>
+
 </html>
