@@ -6,7 +6,13 @@ import json
 import time
 import traceback
 import logging
-
+import base64
+import requests
+import io
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -49,40 +55,44 @@ PRIMARY_MODEL   = "gemini-2.5-flash"
 RATE_LIMIT_WAIT = 30   # seconds to wait before retrying on a 429
 MAX_RETRIES     = 2    # number of rate-limit retries
 
+# ── Ollama config ─────────────────────────────────────────────────────────────
+USE_OLLAMA = os.getenv("USE_OLLAMA", "true").lower() == "true"
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llava")
+
 # ── Prompt ────────────────────────────────────────────────────────────────────
 PROMPT = """Analyze this product packaging image carefully.
-Identify the product type (food, beverage, cosmetic, supplement, cleaning product, etc.).
+First, determine the exact product category. Is it a Food, Beverage, Cosmetic, Supplement, or Household item?
 
-Return ONLY a valid JSON object — no markdown, no code fences, no explanation.
+Return ONLY a valid JSON object matching exactly this structure:
 
 {
-    "productName": "name from the label",
+    "productName": "extract the exact name of the product from the label",
     "category": "Food | Beverage | Cosmetic | Supplement | Skincare | Household",
-    "score": <integer 0-100>,
+    "score": 50,
     "ingredients": [
         {
             "name": "ingredient name exactly as on the label",
             "status": "good",
-            "reason": "2-3 sentences: what it does, health impacts, why this status."
+            "reason": "1 sentence: what it does and why it is good, bad, or neutral."
         }
     ],
     "claims": [
         {
             "claim": "marketing claim exactly as written on label",
             "isReal": true,
-            "explanation": "2-3 sentences on whether accurate or misleading."
+            "explanation": "1 sentence on whether accurate or misleading."
         }
     ]
 }
 
-status must be exactly one of: "good"  "neutral"  "bad"
-isReal must be a boolean: true or false (not a string)
-
-Scoring: 70-100 = healthy/safe | 40-69 = moderate | 0-39 = concerning
-Extract EVERY ingredient and EVERY marketing claim visible on the label.
-If no claims are visible, return: "claims": []
-Analyze only what is actually in the image — do not invent or assume data."""
-
+CRITICAL OCR RULES:
+1. DO NOT guess or hallucinate product names (e.g. do not invent "Easy Shampoo"). Read the actual largest text on the bottle.
+2. Look for the "INGREDIENTS:" list. You MUST extract each ingredient individually. DO NOT summarize them into a single sentence.
+3. If you cannot read the ingredients because it is too blurry, return an empty array [] for ingredients.
+4. status MUST be exactly one of: "good", "neutral", "bad".
+5. Return ONLY raw JSON starting with {. No markdown fences.
+"""
 
 def _strip_fences(raw: str) -> str:
     raw = raw.strip()
@@ -94,7 +104,6 @@ def _strip_fences(raw: str) -> str:
             raw = raw[:-3]
         raw = raw.strip()
     return raw
-
 
 def call_gemini(image_bytes: bytes, mime: str) -> dict:
     """
@@ -108,7 +117,7 @@ def call_gemini(image_bytes: bytes, mime: str) -> dict:
         temperature=0.2,
     )
 
-    for attempt in range(1, MAX_RETRIES + 2):  # attempts: 1, 2, 3
+    for attempt in range(1, MAX_RETRIES + 2):
         try:
             logger.info(f"Calling {PRIMARY_MODEL} (attempt {attempt})")
             response = client.models.generate_content(
@@ -133,12 +142,21 @@ def call_gemini(image_bytes: bytes, mime: str) -> dict:
 
             result.setdefault("productName", "Unknown Product")
             result.setdefault("category", "Product")
-            result.setdefault("score", 50)
             result.setdefault("ingredients", [])
             result.setdefault("claims", [])
-            result["score"] = max(0, min(100, int(result["score"])))
+            
+            # Deterministic Score Calculation
+            score = 100
+            for ing in result.get("ingredients", []):
+                status = ing.get("status", "neutral").lower()
+                if status == "bad":
+                    score -= 30
+                elif status == "neutral":
+                    score -= 5
+            
+            result["score"] = max(0, min(100, score))
 
-            logger.info(f"Success — {result['productName']} (score {result['score']})")
+            logger.info(f"Success — {result['productName']} (computed score {result['score']})")
             return result
 
         except json.JSONDecodeError as e:
@@ -147,12 +165,10 @@ def call_gemini(image_bytes: bytes, mime: str) -> dict:
             raise ValueError(f"AI returned malformed JSON: {e}") from e
 
         except ValueError:
-            raise  # our own errors — don't retry
+            raise
 
         except Exception as e:
             err_str = str(e).lower()
-
-            # Rate limit (429) — wait and retry
             is_rate_limit = any(kw in err_str for kw in [
                 "429", "rate", "quota", "resource_exhausted",
                 "too many requests", "exhausted"
@@ -163,19 +179,89 @@ def call_gemini(image_bytes: bytes, mime: str) -> dict:
                         f"Rate limited. Waiting {RATE_LIMIT_WAIT}s before retry "
                         f"({attempt}/{MAX_RETRIES})..."
                     )
+                    import time
                     time.sleep(RATE_LIMIT_WAIT)
                     continue
                 else:
                     break
-
-            # Any other error — log full traceback and raise
             logger.error(f"Gemini call failed:\n{traceback.format_exc()}")
             raise
 
     raise RuntimeError(
         f"Still rate-limited after {MAX_RETRIES} retries. "
-        "Free tier allows ~2 requests/min. Please wait a moment and try again."
     )
+
+def call_ollama(image_bytes: bytes, mime: str) -> dict:
+    """
+    Call local Ollama model with the image.
+    """
+    logger.info(f"Calling local Ollama model: {OLLAMA_MODEL}")
+    
+    # Force conversion to JPEG and downsize to prevent Ollama from crashing (500 Server Error)
+    if Image is not None:
+        try:
+            img = Image.open(io.BytesIO(image_bytes))
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            # Increased thumbnail size to 1600 so OCR can read tiny ingredients text
+            img.thumbnail((1600, 1600))
+            buffer = io.BytesIO()
+            img.save(buffer, format="JPEG", quality=85)
+            image_bytes = buffer.getvalue()
+        except Exception as e:
+            logger.error(f"Failed to decode or resize image with PIL: {e}")
+            raise ValueError(f"Could not decode image format. Please upload a standard JPG or PNG. Error: {e}")
+    else:
+        logger.warning("Pillow is not installed. Sending raw bytes to Ollama.")
+            
+    # Base64 encode the image
+    b64_image = base64.b64encode(image_bytes).decode('utf-8')
+    
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": PROMPT,
+        "images": [b64_image],
+        "stream": False
+    }
+    
+    try:
+        response = requests.post(OLLAMA_URL, json=payload, timeout=120)
+        response.raise_for_status()
+        
+        data = response.json()
+        raw = data.get("response", "")
+        raw = _strip_fences(raw)
+        
+        result = json.loads(raw)
+        
+        # Apply defaults in case the model missed some fields
+        result.setdefault("productName", "Unknown Product")
+        result.setdefault("category", "Product")
+        result.setdefault("ingredients", [])
+        result.setdefault("claims", [])
+        
+        # Deterministic Score Calculation
+        score = 100
+        for ing in result.get("ingredients", []):
+            status = ing.get("status", "neutral").lower()
+            if status == "bad":
+                score -= 30
+            elif status == "neutral":
+                score -= 5
+        
+        result["score"] = max(0, min(100, score))
+        
+        logger.info(f"Ollama Success — {result['productName']} (computed score {result['score']})")
+        return result
+        
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Ollama connection error: {e}")
+        raise ValueError(f"Raw Ollama Error: {repr(e)}") from e
+    except json.JSONDecodeError as e:
+        preview = raw[:300] if 'raw' in locals() and raw else "N/A"
+        logger.error(f"Ollama JSON decode error: {e} | Raw: {preview!r}")
+        raise ValueError(f"Ollama returned malformed JSON: {e}") from e
+
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -190,11 +276,13 @@ async def read_index():
 async def health():
     """Visit http://localhost:8000/api/health to check your setup."""
     info = {
+        "use_ollama":    USE_OLLAMA,
+        "ollama_model":  OLLAMA_MODEL,
         "sdk_installed": GENAI_OK,
         "sdk_version":   SDK_VERSION,
         "api_key_set":   bool(GEMINI_API_KEY),
         "client_ready":  client is not None,
-        "model":         PRIMARY_MODEL,
+        "gemini_model":  PRIMARY_MODEL,
     }
     if client:
         try:
@@ -228,6 +316,15 @@ async def analyze_image(image: UploadFile = File(...)):
         if not mime.startswith("image/"):
             return JSONResponse({"error": f"Expected an image, got: {mime}"}, status_code=400)
 
+        ollama_error = "Unknown"
+        if USE_OLLAMA:
+            try:
+                result = call_ollama(content, mime)
+                return JSONResponse(content=result)
+            except Exception as e:
+                ollama_error = str(e)
+                logger.warning(f"Ollama API call failed: {e}. Falling back to Gemini (if available).")
+        
         if client:
             try:
                 result = call_gemini(content, mime)
@@ -238,19 +335,13 @@ async def analyze_image(image: UploadFile = File(...)):
         # Mock fallback (no client or call failed)
         logger.warning("No Gemini client or API failed — mock data returned.")
         return JSONResponse(content={
-            "productName": "⚠️ Mock — Gemini API failed or not connected",
-            "category": "Food",
+            "productName": f"⚠️ Mock — Ollama Error: {ollama_error[:100]}",
+            "category": "Error",
             "score": 45,
             "ingredients": [
-                {"name": "Water / Aqua",         "status": "neutral", "reason": "Primary base solvent. Safe and inert."},
-                {"name": "Artificial Fragrance",  "status": "bad",     "reason": "Undisclosed synthetic chemicals. Common allergen."},
-                {"name": "Sodium Lauryl Sulfate", "status": "bad",     "reason": "Harsh surfactant. Disrupts skin barrier with repeated use."},
-                {"name": "Aloe Vera Extract",     "status": "good",    "reason": "Anti-inflammatory and hydrating. Promotes skin recovery."},
+                {"name": "Error details", "status": "bad", "reason": f"Ollama failed with: {ollama_error}"},
             ],
-            "claims": [
-                {"claim": "100% All Natural", "isReal": False, "explanation": "Misleading — contains synthetic Fragrance and SLS."},
-                {"claim": "Made with Real Ingredients", "isReal": True, "explanation": "Technically true, but used as a marketing halo."},
-            ],
+            "claims": [],
         })
 
     except RuntimeError as e:
