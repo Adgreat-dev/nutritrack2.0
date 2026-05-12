@@ -44,9 +44,20 @@ Install the required tools needed to run the app:
 pip install fastapi uvicorn python-multipart google-genai
 ```
 
-### 4. Setting up the Gemini API Key (Optional but recommended)
-NutriTracker requires a Google Gemini API Key to analyze unique images.
-Get an API key from [Google AI Studio](https://aistudio.google.com/), then set it in your environment:
+### 4. Setup AI Model (Ollama or Gemini)
+
+NutriTracker can run entirely locally using Ollama (default), or it can use Google's Gemini API as a fallback.
+
+**Option A: Local AI with Ollama (Recommended)**
+1. Download and install [Ollama](https://ollama.com/).
+2. Open your terminal and download the vision model (we use `llava` by default):
+   ```bash
+   ollama pull llava
+   ```
+3. Keep Ollama running in the background. The application is already configured to use it automatically!
+
+**Option B: Cloud AI with Google Gemini (Alternative/Fallback)**
+If you prefer to use Gemini or if Ollama fails, get an API key from [Google AI Studio](https://aistudio.google.com/), then set it in your environment:
 
 **On Windows (PowerShell):**
 ```powershell
@@ -58,7 +69,7 @@ $env:GEMINI_API_KEY="your_api_key_here"
 export GEMINI_API_KEY="your_api_key_here"
 ```
 
-*(Note: If you skip this step, the backend simply returns mock data. This allows you to still use and view the website layout even without an API key).*
+*(Note: If neither Ollama nor Gemini is set up, the backend will return mock data so you can still view the website layout).*
 
 ### 5. Start the Server
 Run the local live-reloading server:
